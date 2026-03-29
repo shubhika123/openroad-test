@@ -12,16 +12,21 @@ jobs:
         repository: The-OpenROAD-Project/OpenROAD-flow-scripts
         submodules: recursive
 
-    - name: Install Dependencies
+    - name: Fix apt sources
       run: |
-        sudo rm /etc/apt/sources.list.d/yarn.list 2>/dev/null || true
-        sudo ./etc/DependencyInstaller.sh -all
+        sudo rm -f /etc/apt/sources.list.d/yarn.list
+        sudo apt-get update
+
+    - name: Install Dependencies
+      run: sudo ./etc/DependencyInstaller.sh -all
 
     - name: Build Tools
       run: ./build_openroad.sh --local --no_init
 
     - name: Run GCD Flow
-      run: cd flow && make DESIGN_CONFIG=./designs/nangate45/gcd/config.mk
+      run: |
+        cd flow
+        make DESIGN_CONFIG=./designs/nangate45/gcd/config.mk
 
     - name: Upload Results
       uses: actions/upload-artifact@v4
